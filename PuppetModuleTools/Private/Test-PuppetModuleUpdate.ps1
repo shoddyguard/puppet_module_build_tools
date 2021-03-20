@@ -7,35 +7,19 @@
     PS C:\> Test-PuppetModuleUpdate
 .INPUTS
     ValidExitCodes: which exit codes are expected
-    ModulePath: the path to the Puppet module to test
 #>
 function Test-PuppetModuleUpdate
 {
     [CmdletBinding()]
     param
     (
-
         # The codes you expect PDK to return on a successful run
         [Parameter(Mandatory = $false)]
         [Array]
-        $ValidExitCodes = @(0),
-
-        # The path to the module to test against
-        [Parameter(Mandatory = $false)]
-        [string]
-        $ModulePath = $env:PuppetModuleRoot
+        $ValidExitCodes = @(0)
     )
-    try
-    {
-        Push-Location -Path $ModulePath -ErrorAction Stop
-    }
-    catch
-    {
-        throw "Failed to move into Puppet module path"
-    }
     # Perform a noop to be safe
-    $PDK_Output = Invoke-Expression 'pdk update --noop'
-    Pop-Location
+    $PDK_Output = Invoke-Expression 'pdk update --noop 2>&1'
     if ($LASTEXITCODE -notin $ValidExitCodes)
     {
         throw "Update check failed. Exit code: $LASTEXITCODE."
@@ -44,5 +28,5 @@ function Test-PuppetModuleUpdate
     {
         throw "Puppet module can be updated. Check update_report.txt for details."
     }
-    Write-Host "Module up-to-date" -ForegroundColor Green
+    Write-Verbose "Module up-to-date"
 }

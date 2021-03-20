@@ -1,3 +1,14 @@
+<#
+.SYNOPSIS
+    Performs acceptance tests against a Puppet module
+.DESCRIPTION
+    Performs Puppet Litmus acceptance testing against a Puppet module
+.EXAMPLE
+    PS C:\myModule> Test-PuppetAcceptance -Provisioners vagrant
+    Will perform acceptance testing using Vagrant on the module located at c:\myModule
+.INPUTS
+    Provisioners: the provisioner(s) to use for testing (the ones defined in provisioners.yaml)
+#>
 function Test-PuppetAcceptance
 {
     [CmdletBinding()]
@@ -6,92 +17,75 @@ function Test-PuppetAcceptance
         # The provisioner(s) to use
         [Parameter(Mandatory = $false)]
         [array]
-        $Provisioners = @('default'),
-
-        # The path to the Puppet module to test against
-        [Parameter(Mandatory = $false)]
-        [string]
-        $ModulePath = $env:PuppetModuleRoot
+        $Provisioners = @('default')
     )
-    try
-    {
-        Push-Location -Path $ModulePath -ErrorAction Stop
-    }
-    catch
-    {
-        throw "$($_.Exception.Message)"
-    }
     foreach ($Provisioner in $Provisioners)
     {
         $ProvisionerResult = ''
+        Write-Verbose "Setting up provisioner: $Provisioner"
         try
         {
-            $ProvisionerResult = Invoke-Expression "pdk bundle exec rake `"litmus:provision_list[$Provisioner]`""
+            $ProvisionerResult = Invoke-Expression "pdk bundle exec rake `"litmus:provision_list[$Provisioner]`" 2>&1"
         }
         catch
         {
-            Pop-Location
             throw "Provisioner: $Provisioner has failed."
         }
         if ($LASTEXITCODE -ne 0)
         {
-            Pop-Location
-            throw "Provisoner returned a non-zero exit code."
+            throw "Provisoner returned a non-zero exit code. Exit code: $LASTEXITCODE"
         }
         if ($Provisioner -eq 'vagrant')
         {
+            Write-Verbose "Setting Puppet path"
             # If we're running vagrant then we'll need to get '/opt/puppet' onto roots path.
             $SetPuppetPathResult = ''
             try
             {
-                $SetPuppetPathResult = Invoke-Expression "pdk bundle exec bolt task run provision::fix_secure_path --modulepath spec/fixtures/modules -i inventory.yaml -t ssh_nodes"
+                $SetPuppetPathResult = Invoke-Expression "pdk bundle exec bolt task run provision::fix_secure_path --modulepath spec/fixtures/modules -i inventory.yaml -t ssh_nodes 2>&1'"
             }
             catch
             {
-                Pop-Location
                 throw "Failed to set secure path."
             }
             if ($LASTEXITCODE -ne 0)
             {
-                Pop-Location
                 throw "Failed to set secure path, non-zero exit code. Exit code: $LASTEXITCODE"
             }
         }
     }
     # Install Puppet agent on all running provisioners
+    Write-Verbose "Installing Puppet Agent"
     try
     {
-        $AgentResult = Invoke-Expression 'pdk bundle exec rake litmus:install_agent'
+        $AgentResult = Invoke-Expression 'pdk bundle exec rake litmus:install_agent 2>&1'
     }
     catch
     {
-        Pop-Location
         throw "Failed to install Puppet Agent."
     }
     if ($LASTEXITCODE -ne 0)
     {
-        Pop-Location
         throw "Puppet agent install returned a non-zero exit code. Exit code: $LASTEXITCODE"
     }
     # Install the Puppet module
+    Write-Verbose "Installing Puppet module"
     try
     {
-        $ModuleResult = Invoke-Expression 'pdk bundle exec rake litmus:install_module'
+        $ModuleResult = Invoke-Expression 'pdk bundle exec rake litmus:install_module 2>&1'
     }
     catch
     {
-        Pop-Location
         throw "Failed to install Puppet module."
     }
     if ($LASTEXITCODE -ne 0)
     {
-        Pop-Location
         throw "Module install returned a non-zero exit code. Exit code: $LASTEXITCODE"
     }
 
     # Perform the acceptance test(s)
-    $TestResult = Invoke-Expression "pdk bundle exec rake litmus:acceptance:parallel"
-    Pop-Location
+    Write-Verbose "Performing litmus test(s)"
+    $TestResult = Invoke-Expression "pdk bundle exec rake litmus:acceptance:parallel 2>&1"
     if ($LASTEXITCODE -ne 0)
     {
         throw "Acceptance tests have failed. Exit code: $LASTEXITCODE."
@@ -100,5 +94,5 @@ function Test-PuppetAcceptance
     {
         throw "Acceptance tests contain 1 or more failures/errors.`n$TestResult"
     }
-    Write-Host "Acceptance tests passed succesfully" -ForegroundColor Green
+    Write-Verbose "Acceptance tests passed succesfully"
 }
