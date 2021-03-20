@@ -6,8 +6,13 @@
 #>
 
 [CmdletBinding()]
-param()
-
+param(
+    # The path to the module you'd like to test
+    [Parameter(Mandatory = $true, ValueFromPipelineByPropertyName = $true)]
+    [string]
+    $ModulePath
+)
+$env:PuppetModuleRoot = $ModulePath
 # Stop on any errors
 $ErrorActionPreference = 'Stop'
 Write-Output "Checking prequisites"
@@ -26,7 +31,7 @@ Write-Host "Prerequisite check ok" -ForegroundColor Green
 Write-Output "Importing TestPuppetCode PowerShell module"
 try
 {
-    Import-Module "$PSScriptRoot/TestPuppetCode/TestPuppetCode.psm1" -Force
+    Import-Module "$PSScriptRoot/../TestPuppetCode/TestPuppetCode.psm1" -Force
 }
 catch
 {
@@ -34,8 +39,16 @@ catch
 }
 Write-Host "TestPuppetCode module imported" -ForegroundColor Green
 Write-Output "Ensuring gems are present..."
-
+try
+{
+    Push-Location -Path $env:PuppetModuleRoot
+}
+catch
+{
+    throw "Failed to navigate to module root.$($_.Exception.Message)"
+}
 $BundleOutPut = Invoke-Expression 'pdk bundle install'
+Pop-Location
 if ($LASTEXITCODE -ne 0)
 {
     throw "Failed to install gems."
@@ -98,6 +111,8 @@ catch
 finally
 {
     Write-Host "Tearing down provisioners"
+    Push-Location -Path $env:PuppetModuleRoot
     Start-Process 'pdk' -ArgumentList 'bundle exec rake litmus:tear_down' -Wait -NoNewWindow
+    Pop-Location
 }
 Write-Host "All checks have passed, module should be good to go!" -ForegroundColor Green

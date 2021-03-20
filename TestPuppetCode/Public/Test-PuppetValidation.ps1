@@ -10,7 +10,7 @@ function Test-PuppetValidation
         # The path to the module to test against
         [Parameter(Mandatory = $false)]
         [string]
-        $ModulePath
+        $ModulePath = $env:PuppetModuleRoot
     )
     try
     {
