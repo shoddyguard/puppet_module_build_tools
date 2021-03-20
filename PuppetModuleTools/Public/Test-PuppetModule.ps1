@@ -59,6 +59,7 @@ function Test-PuppetModule
     }
     catch
     {
+        Pop-Location
         throw "$($_.Exception.Message)"
     }
 
@@ -70,6 +71,7 @@ function Test-PuppetModule
     }
     catch
     {
+        Pop-Location
         throw "$($_.Exception.Message)"
     }
 
@@ -81,6 +83,7 @@ function Test-PuppetModule
     }
     catch
     {
+        Pop-Location
         throw "$($_.Exception.Message)"
     }
 
