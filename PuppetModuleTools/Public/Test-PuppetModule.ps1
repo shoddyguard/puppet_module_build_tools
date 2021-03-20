@@ -18,7 +18,7 @@
     Essentially PoSh treats anything written to stderr as an error but many programs don't want to put everything on stdout and so will write non-errors to stderr (eg info etc) 
     PDK is one of these programs meaning the try/catch blocks get sad and will terminate the first time pdk writes to stderr.
     Seeing as we handle throwing exceptions in all our cmdlets we should be safe to use -ErrorAction SilentlyContinue on all out try/catch blocks below.
-    We could also look into writing custom exception classes and filtering the catch blocks to only grab those.
+    We could also look into writing custom exception classes and filtering the catch blocks to only grab those. (tried 2021-20-03 didn't work)
 #>
 function Test-PuppetModule
 {
