@@ -19,20 +19,6 @@ function Test-PuppetModule
         $Provisioners = @('default')
     )
 
-    # Check that the relevant tools exist. (should this maybe be in an init?)
-    Write-Verbose "Checking prequisite tools are available on the path"
-    foreach ($bin in @('pdk', 'puppet', 'bolt', 'gem'))
-    {
-        try
-        {
-            Get-Command $bin | Out-Null
-        }
-        catch
-        {
-            throw "Cannot find '$bin' on the path."
-        }
-    }
-
     # Navigate to the folder where we're going to test against
     Write-Verbose "Setting working directory to $ModulePath"
     try
