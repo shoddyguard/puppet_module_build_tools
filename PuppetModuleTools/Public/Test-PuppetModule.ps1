@@ -1,3 +1,16 @@
+<#
+.SYNOPSIS
+    Performs various tests against a give Puppet module
+.DESCRIPTION
+    Performs various tests against a give Puppet module
+.EXAMPLE
+    PS C:\> Test-PuppetModule -ModulePath c:\myModule
+    Will test the module at c:\myModule
+.INPUTS
+    Module path: the path to the module to test
+    TestAcceptance: Whether or not to perform an acceptance test using Puppet Litmus
+    Provisioners: When testing acceptance this is the provisioner(s) to use
+#>
 function Test-PuppetModule
 {
     [CmdletBinding()]
@@ -93,7 +106,7 @@ function Test-PuppetModule
         Write-Verbose "Performing acceptance test(s)"
         try
         {
-            Test-PuppetAcceptance
+            Test-PuppetAcceptance -Provisioners $Provisioners
         }
         catch
         {
