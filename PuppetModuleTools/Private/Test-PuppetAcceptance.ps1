@@ -22,6 +22,7 @@ function Test-PuppetAcceptance
     foreach ($Provisioner in $Provisioners)
     {
         $ProvisionerResult = ''
+        Write-Verbose "Setting up provisioner: $Provisioner"
         try
         {
             $ProvisionerResult = Invoke-Expression "pdk bundle exec rake `"litmus:provision_list[$Provisioner]`" 2>&1"
@@ -36,6 +37,7 @@ function Test-PuppetAcceptance
         }
         if ($Provisioner -eq 'vagrant')
         {
+            Write-Verbose "Setting Puppet path"
             # If we're running vagrant then we'll need to get '/opt/puppet' onto roots path.
             $SetPuppetPathResult = ''
             try
@@ -53,6 +55,7 @@ function Test-PuppetAcceptance
         }
     }
     # Install Puppet agent on all running provisioners
+    Write-Verbose "Installing Puppet Agent"
     try
     {
         $AgentResult = Invoke-Expression 'pdk bundle exec rake litmus:install_agent 2>&1'
@@ -66,6 +69,7 @@ function Test-PuppetAcceptance
         throw "Puppet agent install returned a non-zero exit code. Exit code: $LASTEXITCODE"
     }
     # Install the Puppet module
+    Write-Verbose "Installing Puppet module"
     try
     {
         $ModuleResult = Invoke-Expression 'pdk bundle exec rake litmus:install_module 2>&1'
@@ -80,6 +84,7 @@ function Test-PuppetAcceptance
     }
 
     # Perform the acceptance test(s)
+    Write-Verbose "Performing litmus test(s)"
     $TestResult = Invoke-Expression "pdk bundle exec rake litmus:acceptance:parallel 2>&1"
     if ($LASTEXITCODE -ne 0)
     {

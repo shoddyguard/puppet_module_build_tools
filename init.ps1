@@ -16,7 +16,7 @@ foreach ($bin in @('pdk', 'puppet', 'bolt', 'gem'))
 Write-Verbose "Checking for the presence of acceptance testing tools"
 try
 {
-    Get-Command 'vagrant'
+    Get-Command 'vagrant' | Out-Null
 }
 catch
 {
@@ -24,7 +24,7 @@ catch
 }
 try
 {
-    Get-Command 'docker'
+    Get-Command 'docker' | Out-Null
 }
 catch
 {
@@ -40,3 +40,4 @@ catch
 {
     throw "Failed to import the PuppetModuleTools module.`n$($_.Exception.Message)"
 }
+Write-Host "Puppet tools successfully initialized!"

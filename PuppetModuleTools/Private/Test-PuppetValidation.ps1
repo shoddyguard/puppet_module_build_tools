@@ -26,7 +26,7 @@ function Test-PuppetValidation
         [bool]
         $FailOnWarning = $true
     )
-    $Validation = Invoke-Expression 'pdk validate 2>&1'
+    $Validation = Invoke-Expression 'pdk validate' 2>&1
     if ($LASTEXITCODE -notin $ValidExitCodes)
     {
         throw "Puppet module validation has failed. Exit code: $($LASTEXITCODE)."
