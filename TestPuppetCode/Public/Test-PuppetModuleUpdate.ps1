@@ -1,23 +1,19 @@
 <#
 .SYNOPSIS
-    Tests if a module complies with PDK defaults
+    Tests if a module can be updated
 .DESCRIPTION
-    Runs a 'pdk convert --noop' as a simple way of checking things conform to the latest standards.
+    Runs a 'pdk update --noop' as a simple way of checking things conform to the latest standards.
 .EXAMPLE
-    PS C:\> Test-PuppetModuleConformity
+    PS C:\> Test-PuppetModuleUpdate
 .INPUTS
-    Command: the command to be run (defaults to 'pdk convert --noop)
     ValidExitCodes: which exit codes are expected
+    ModulePath: the path to the Puppet module to test
 #>
-function Test-PuppetModuleConformity
+function Test-PuppetModuleUpdate
 {
     [CmdletBinding()]
     param
     (
-        # The command to run
-        [Parameter(Mandatory = $false)]
-        [string]
-        $CommandToExecute = "pdk convert --noop",
 
         # The codes you expect PDK to return on a successful run
         [Parameter(Mandatory = $false)]
@@ -38,15 +34,15 @@ function Test-PuppetModuleConformity
         throw "Failed to move into Puppet module path"
     }
     # Perform a noop to be safe
-    $PDK_Output = Invoke-Expression $CommandToExecute
+    $PDK_Output = Invoke-Expression 'pdk update --noop'
     Pop-Location
     if ($LASTEXITCODE -notin $ValidExitCodes)
     {
-        throw "Command '$CommandToExecute' failed. Exit code: $LASTEXITCODE."
+        throw "Update check failed. Exit code: $LASTEXITCODE."
     }
     if ($PDK_Output -notmatch 'No changes required.')
     {
-        throw "Drift detected on $CommandToExecute. Check report.txt."
+        throw "Puppet module can be updated. Check update_report.txt for details."
     }
-    Write-Host "No drift detected" -ForegroundColor Green
+    Write-Host "Module up-to-date" -ForegroundColor Green
 }

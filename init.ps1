@@ -31,7 +31,7 @@ Write-Host "Prerequisite check ok" -ForegroundColor Green
 Write-Output "Importing TestPuppetCode PowerShell module"
 try
 {
-    Import-Module "$PSScriptRoot/../TestPuppetCode/TestPuppetCode.psm1" -Force
+    Import-Module "$PSScriptRoot/TestPuppetCode/TestPuppetCode.psm1" -Force
 }
 catch
 {
@@ -58,7 +58,7 @@ Write-Host "Gems installed succesfully" -ForegroundColor Green
 Write-Output "Checking module is up-to-date..."
 try
 {
-    Test-PuppetModuleConformity -CommandToExecute 'pdk update --noop'
+    Test-PuppetModuleUpdate
 }
 catch
 {
@@ -69,7 +69,7 @@ catch
 Write-Output "Checking module conformity..."
 try
 {
-    Test-PuppetModuleConformity
+    Test-PuppetModuleConversion
 }
 catch
 {
