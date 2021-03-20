@@ -31,7 +31,7 @@ function Test-PuppetModule
     }
 
     # Install the gems - I wonder if gem update may be better here?
-    Write-Verbose "Installing gems from gemfile"
+    Write-Verbose "Installing gems from gemfile 2>&1"
     $BundleOutPut = Invoke-Expression 'pdk bundle install'
     if ($LASTEXITCODE -ne 0)
     {
