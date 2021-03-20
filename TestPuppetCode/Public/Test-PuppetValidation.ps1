@@ -5,11 +5,16 @@ function Test-PuppetValidation
         # The codes you expect PDK to return on a successful run
         [Parameter(Mandatory = $false)]
         [Array]
-        $ValidExitCodes = @(0)
+        $ValidExitCodes = @(0),
+
+        # The path to the module to test against
+        [Parameter(Mandatory = $false)]
+        [string]
+        $ModulePath
     )
     try
     {
-        Push-Location -Path $env:PuppetModuleRoot -ErrorAction Stop
+        Push-Location -Path $ModulePath -ErrorAction Stop
     }
     catch
     {

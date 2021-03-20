@@ -1,7 +1,6 @@
 [CmdletBinding()]
 param()
 # Get the folder wot contains everything.
-$env:PuppetModuleRoot = (Get-Item $PSScriptRoot -Force).Parent.Parent.FullName # This is more compatible with PoSh core, we need the -Force flag to find hidden (aka dot) files/folders (which .test is)
 $PublicCmdlets = @()
 # Work out which SU check to perform
 

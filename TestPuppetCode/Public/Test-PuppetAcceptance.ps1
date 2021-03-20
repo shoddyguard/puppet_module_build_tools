@@ -6,11 +6,16 @@ function Test-PuppetAcceptance
         # The provisioner(s) to use
         [Parameter(Mandatory = $false)]
         [array]
-        $Provisioners = @('default')
+        $Provisioners = @('default'),
+
+        # The path to the Puppet module to test against
+        [Parameter(Mandatory = $false)]
+        [string]
+        $ModulePath = $env:PuppetModuleRoot
     )
     try
     {
-        Push-Location -Path $env:PuppetModuleRoot -ErrorAction Stop
+        Push-Location -Path $ModulePath -ErrorAction Stop
     }
     catch
     {
