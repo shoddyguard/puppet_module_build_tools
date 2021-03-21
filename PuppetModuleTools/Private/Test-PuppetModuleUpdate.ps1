@@ -16,10 +16,20 @@ function Test-PuppetModuleUpdate
         # The codes you expect PDK to return on a successful run
         [Parameter(Mandatory = $false)]
         [Array]
-        $ValidExitCodes = @(0)
+        $ValidExitCodes = @(0),
+
+        # Whether or not to disable PDK's output.
+        [Parameter(Mandatory = $false, ValueFromPipelineByPropertyName = $true, Position = 3)]
+        [bool]
+        $SurpressPDKOutput = $true
     )
     # Perform a noop to be safe
-    $PDK_Output = Invoke-Expression 'pdk update --noop 2>&1'
+    $Command = 'pdk update --noop'
+    if ($SurpressPDKOutput -eq $true)
+    {
+        $Command = $Command + ' 2>&1'
+    }
+    $PDK_Output = Invoke-Expression $Command
     if ($LASTEXITCODE -notin $ValidExitCodes)
     {
         throw "Update check failed. Exit code: $LASTEXITCODE."

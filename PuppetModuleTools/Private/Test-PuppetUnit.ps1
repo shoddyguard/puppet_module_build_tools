@@ -16,9 +16,19 @@ function Test-PuppetUnit
         # The expected exit codes
         [Parameter(Mandatory = $false)]
         [array]
-        $ValidExitCodes = @(0)
+        $ValidExitCodes = @(0),
+
+        # Whether or not to disable PDK's output.
+        [Parameter(Mandatory = $false, ValueFromPipelineByPropertyName = $true, Position = 3)]
+        [bool]
+        $SurpressPDKOutput = $true
     )
-    $PDK_Output = Invoke-Expression 'pdk test unit 2>&1'
+    $Command = 'pdk test unit'
+    if ($SurpressPDKOutput -eq $true)
+    {
+        $Command = $Command + ' 2>&1'
+    }
+    $PDK_Output = Invoke-Expression $Command
     if ($LASTEXITCODE -notin $ValidExitCodes)
     {
         throw "PDK unit tests have failed. Exit code: $LASTEXITCODE."

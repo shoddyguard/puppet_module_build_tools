@@ -10,6 +10,7 @@
     Module path: the path to the module to test
     TestAcceptance: Whether or not to perform an acceptance test using Puppet Litmus
     Provisioners: When testing acceptance this is the provisioner(s) to use
+    SurpressPDKOutput: Whether or not to disable PDK's output. Useful to disable when you're interested in seeing the full output.
 .NOTES
     There appears to be a bit of a bug when specifying 2>&1 in PoSh core 7.1 :(
     https://stackoverflow.com/questions/66726049/how-can-i-redirect-stdout-and-stderr-without-polluting-powershell-error-output/
@@ -38,9 +39,17 @@ function Test-PuppetModule
         # When testing acceptance this is the provisioner(s) to use
         [Parameter(Mandatory = $false, ValueFromPipelineByPropertyName = $true, Position = 2, ParameterSetName = 'Acceptance')]
         [array]
-        $Provisioners = @('default')
-    )
+        $Provisioners = @('default'),
 
+        # Whether or not to disable PDK's output.
+        [Parameter(Mandatory = $false, ValueFromPipelineByPropertyName = $true, Position = 3)]
+        [bool]
+        $SurpressPDKOutput = $true
+    )
+    $DefaultParams = @{
+        ErrorAction = 'SilentlyContinue'
+        SurpressPDKOutput = $SurpressPDKOutput
+    }
     # Navigate to the folder where we're going to test against
     Write-Verbose "Setting working directory to $ModulePath"
     try
@@ -56,7 +65,7 @@ function Test-PuppetModule
     Write-Verbose "Installing gems from gemfile"
     try
     {
-        Install-PDKBundle -ErrorAction 'SilentlyContinue'
+        Install-PDKBundle @DefaultParams
     }
     catch
     {
@@ -68,7 +77,7 @@ function Test-PuppetModule
     Write-Verbose "Checking module is up-to-date"
     try
     {
-        Test-PuppetModuleUpdate -ErrorAction SilentlyContinue
+        Test-PuppetModuleUpdate @DefaultParams
     }
     catch
     {
@@ -80,7 +89,7 @@ function Test-PuppetModule
     Write-Verbose "Checking if module needs to be converted"
     try
     {
-        Test-PuppetModuleConversion -ErrorAction SilentlyContinue
+        Test-PuppetModuleConversion @DefaultParams
     }
     catch
     {
@@ -92,7 +101,7 @@ function Test-PuppetModule
     Write-Verbose "Checking module validation"
     try
     {
-        Test-PuppetValidation -ErrorAction SilentlyContinue
+        Test-PuppetValidation @DefaultParams
     }
     catch
     {
@@ -104,7 +113,7 @@ function Test-PuppetModule
     Write-Verbose "Performing Puppet unit tests"
     try
     {
-        Test-PuppetUnit -ErrorAction SilentlyContinue
+        Test-PuppetUnit @DefaultParams
     }
     catch
     {
@@ -118,7 +127,7 @@ function Test-PuppetModule
         Write-Verbose "Performing acceptance test(s)"
         try
         {
-            Test-PuppetAcceptance -Provisioners $Provisioners -ErrorAction SilentlyContinue
+            Test-PuppetAcceptance -Provisioners $Provisioners @DefaultParams
         }
         catch
         {
@@ -127,7 +136,7 @@ function Test-PuppetModule
         finally
         {
             Write-Verbose "Tearing down provisioner(s)"
-            Remove-Provisioners -ErrorAction 'SilentlyContinue'
+            Remove-Provisioners @DefaultParams
             Write-Verbose "Popping location from stack"
             Pop-Location
             Write-Verbose "All checks completed successfully"

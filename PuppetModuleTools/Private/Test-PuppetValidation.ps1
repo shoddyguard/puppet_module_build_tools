@@ -24,9 +24,19 @@ function Test-PuppetValidation
         # If set to true will fail if the validation contains warnings
         [Parameter(Mandatory = $false, ValueFromPipelineByPropertyName = $true, Position = 1)]
         [bool]
-        $FailOnWarning = $true
+        $FailOnWarning = $true,
+
+        # Whether or not to disable PDK's output.
+        [Parameter(Mandatory = $false, ValueFromPipelineByPropertyName = $true, Position = 3)]
+        [bool]
+        $SurpressPDKOutput = $true
     )
-    $Validation = Invoke-Expression 'pdk validate' 2>&1
+    $Command = 'pdk validate'
+    if ($SurpressPDKOutput -eq $true)
+    {
+        $Command = $Command + ' 2>&1'
+    }
+    $Validation = Invoke-Expression $Command
     if ($LASTEXITCODE -notin $ValidExitCodes)
     {
         throw "Puppet module validation has failed. Exit code: $($LASTEXITCODE)."

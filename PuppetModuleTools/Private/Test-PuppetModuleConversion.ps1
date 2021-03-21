@@ -16,10 +16,20 @@ function Test-PuppetModuleConversion
         # The codes you expect PDK to return on a successful run
         [Parameter(Mandatory = $false)]
         [Array]
-        $ValidExitCodes = @(0)
+        $ValidExitCodes = @(0),
+
+        # Whether or not to disable PDK's output.
+        [Parameter(Mandatory = $false, ValueFromPipelineByPropertyName = $true, Position = 3)]
+        [bool]
+        $SurpressPDKOutput = $true
     )
     # Perform a noop to be safe
-    $PDK_Output = Invoke-Expression 'pdk convert --noop 2>&1'
+    $Command = 'pdk convert --noop'
+    if ($SurpressPDKOutput -eq $true)
+    {
+        $Command = $Command + ' 2>&1'
+    }
+    $PDK_Output = Invoke-Expression $Command
     if ($LASTEXITCODE -notin $ValidExitCodes)
     {
         throw "Convert check failed. Exit code: $LASTEXITCODE."
