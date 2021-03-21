@@ -17,21 +17,12 @@ function Test-PuppetAcceptance
         # The provisioner(s) to use
         [Parameter(Mandatory = $false)]
         [array]
-        $Provisioners = @('default'),
-
-        # Whether or not to disable PDK's output.
-        [Parameter(Mandatory = $false, ValueFromPipelineByPropertyName = $true, Position = 3)]
-        [bool]
-        $SurpressPDKOutput = $true
+        $Provisioners = @('default')
     )
     foreach ($Provisioner in $Provisioners)
     {
         $ProvisionerResult = ''
-        $ProvisionCommand = "pdk bundle exec rake `"litmus:provision_list[$Provisioner]`""
-        if ($SurpressPDKOutput -eq $true)
-        {
-            $ProvisionCommand = $ProvisionCommand + ' 2>&1'
-        }
+        $ProvisionCommand = "pdk bundle exec rake `"litmus:provision_list[$Provisioner]`" 2>&1"
         Write-Verbose "Setting up provisioner: $Provisioner"
         try
         {
@@ -52,11 +43,7 @@ function Test-PuppetAcceptance
             Write-Verbose "Setting Puppet path"
             # If we're running vagrant then we'll need to get '/opt/puppet' onto roots path.
             $SetPuppetPathResult = ''
-            $SetPuppetCommand = 'pdk bundle exec bolt task run provision::fix_secure_path --modulepath spec/fixtures/modules -i inventory.yaml -t ssh_nodes'
-            if ($SurpressPDKOutput -eq $true)
-            {
-                $SetPuppetCommand = $SetPuppetCommand + ' 2>&1'
-            }
+            $SetPuppetCommand = 'pdk bundle exec bolt task run provision::fix_secure_path --modulepath spec/fixtures/modules -i inventory.yaml -t ssh_nodes 2>&1'
             try
             {
                 $SetPuppetPathResult = Invoke-Expression $SetPuppetCommand
@@ -75,11 +62,7 @@ function Test-PuppetAcceptance
     }
     # Install Puppet agent on all running provisioners
     Write-Verbose "Installing Puppet Agent"
-    $AgentCommand = 'pdk bundle exec rake litmus:install_agent'
-    if ($SurpressPDKOutput -eq $true)
-    {
-        $AgentCommand = $AgentCommand + ' 2>&1'
-    }
+    $AgentCommand = 'pdk bundle exec rake litmus:install_agent 2>&1'
     try
     {
         $AgentResult = Invoke-Expression $AgentCommand
@@ -96,11 +79,7 @@ function Test-PuppetAcceptance
     }
     # Install the Puppet module
     Write-Verbose "Installing Puppet module"
-    $ModuleCommand = 'pdk bundle exec rake litmus:install_module'
-    if ($SurpressPDKOutput -eq $true)
-    {
-        $ModuleCommand = $ModuleCommand + ' 2>&1'
-    }
+    $ModuleCommand = 'pdk bundle exec rake litmus:install_module 2>&1'
     try
     {
         $ModuleResult = Invoke-Expression $ModuleCommand
@@ -118,11 +97,7 @@ function Test-PuppetAcceptance
 
     # Perform the acceptance test(s)
     Write-Verbose "Performing litmus test(s)"
-    $TestCommand = 'pdk bundle exec rake litmus:acceptance:parallel'
-    if ($SurpressPDKOutput -eq $true)
-    {
-        $TestCommand = $TestCommand + ' 2>&1'
-    }
+    $TestCommand = 'pdk bundle exec rake litmus:acceptance:parallel 2>&1'
     $TestResult = Invoke-Expression $TestCommand
     if ($LASTEXITCODE -ne 0)
     {

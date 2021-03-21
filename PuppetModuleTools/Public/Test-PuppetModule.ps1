@@ -39,16 +39,10 @@ function Test-PuppetModule
         # When testing acceptance this is the provisioner(s) to use
         [Parameter(Mandatory = $false, ValueFromPipelineByPropertyName = $true, Position = 2, ParameterSetName = 'Acceptance')]
         [array]
-        $Provisioners = @('default'),
-
-        # Whether or not to disable PDK's output.
-        [Parameter(Mandatory = $false, ValueFromPipelineByPropertyName = $true, Position = 3)]
-        [bool]
-        $SurpressPDKOutput = $true
+        $Provisioners = @('default')
     )
     $DefaultParams = @{
         ErrorAction = 'SilentlyContinue'
-        SurpressPDKOutput = $SurpressPDKOutput
     }
     # Navigate to the folder where we're going to test against
     Write-Verbose "Setting working directory to $ModulePath"
