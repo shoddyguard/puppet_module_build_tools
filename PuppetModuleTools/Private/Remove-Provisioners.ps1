@@ -9,6 +9,6 @@ function Remove-Provisioners
     $PDK_Output = Invoke-Expression 'pdk bundle exec rake litmus:tear_down 2>&1'
     if ($LASTEXITCODE -notin $ValidExitCodes)
     {
-        throw "Unhandled exit code. Exit code: $LASTEXITCODE"
+        throw "Failed to remove provisioners, unhandled exit code. Exit code: $LASTEXITCODE"
     }
 }
