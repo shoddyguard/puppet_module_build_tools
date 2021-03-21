@@ -25,7 +25,7 @@ catch
 
 try
 {
-    Test-PuppetModule -ModulePath $ModulePath -TestAcceptance:$false -Verbose
+    Test-PuppetModule -ModulePath $ModulePath -TestAcceptance:$true -Verbose
 }
 catch
 {
