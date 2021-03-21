@@ -32,11 +32,12 @@ function Test-PuppetModuleUpdate
     $PDK_Output = Invoke-Expression $Command
     if ($LASTEXITCODE -notin $ValidExitCodes)
     {
+        $PDK_Output
         throw "Update check failed. Exit code: $LASTEXITCODE."
     }
     if ($PDK_Output -notmatch 'No changes required.')
     {
-        throw "Puppet module can be updated. Check update_report.txt for details."
+        throw "Puppet module can be updated. Check update_report.txt in the module root for details."
     }
     Write-Verbose "Module up-to-date"
 }

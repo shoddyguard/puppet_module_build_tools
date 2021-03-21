@@ -19,6 +19,7 @@ function Remove-Provisioners
     $PDK_Output = Invoke-Expression $Command
     if ($LASTEXITCODE -notin $ValidExitCodes)
     {
+        $PDK_Output
         throw "Failed to remove provisioners, unhandled exit code. Exit code: $LASTEXITCODE"
     }
 }

@@ -31,10 +31,12 @@ function Test-PuppetUnit
     $PDK_Output = Invoke-Expression $Command
     if ($LASTEXITCODE -notin $ValidExitCodes)
     {
+        $PDK_Output
         throw "PDK unit tests have failed. Exit code: $LASTEXITCODE."
     }
     if (-not($PDK_Output -match "0 failures"))
     {
+        $PDK_Output
         throw "PDK unit tests contain failures."
     }
     Write-Verbose "Module unit tests successfully passed"

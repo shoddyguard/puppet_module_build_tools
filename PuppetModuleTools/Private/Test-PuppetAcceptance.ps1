@@ -39,10 +39,12 @@ function Test-PuppetAcceptance
         }
         catch
         {
+            $ProvisionerResult
             throw "Provisioner: $Provisioner has failed."
         }
         if ($LASTEXITCODE -ne 0)
         {
+            $ProvisionerResult
             throw "Provisoner returned a non-zero exit code. Exit code: $LASTEXITCODE"
         }
         if ($Provisioner -eq 'vagrant')
@@ -61,10 +63,12 @@ function Test-PuppetAcceptance
             }
             catch
             {
+                $SetPuppetPathResult
                 throw "Failed to set secure path."
             }
             if ($LASTEXITCODE -ne 0)
             {
+                $SetPuppetPathResult
                 throw "Failed to set secure path, non-zero exit code. Exit code: $LASTEXITCODE"
             }
         }
@@ -82,10 +86,12 @@ function Test-PuppetAcceptance
     }
     catch
     {
+        $AgentResult
         throw "Failed to install Puppet Agent."
     }
     if ($LASTEXITCODE -ne 0)
     {
+        $AgentResult
         throw "Puppet agent install returned a non-zero exit code. Exit code: $LASTEXITCODE"
     }
     # Install the Puppet module
@@ -101,10 +107,12 @@ function Test-PuppetAcceptance
     }
     catch
     {
+        $ModuleResult
         throw "Failed to install Puppet module."
     }
     if ($LASTEXITCODE -ne 0)
     {
+        $ModuleResult
         throw "Module install returned a non-zero exit code. Exit code: $LASTEXITCODE"
     }
 
@@ -118,10 +126,12 @@ function Test-PuppetAcceptance
     $TestResult = Invoke-Expression $TestCommand
     if ($LASTEXITCODE -ne 0)
     {
+        $TestResult
         throw "Acceptance tests have failed. Exit code: $LASTEXITCODE."
     }
     if ((-not($TestResult -match '0 failure')) -or ($TestResult -match 'error occurred'))
     {
+        $TestResult
         throw "Acceptance tests contain 1 or more failures/errors.`n$TestResult"
     }
     Write-Verbose "Acceptance tests passed succesfully"

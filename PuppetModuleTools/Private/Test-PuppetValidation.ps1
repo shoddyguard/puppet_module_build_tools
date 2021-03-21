@@ -39,12 +39,14 @@ function Test-PuppetValidation
     $Validation = Invoke-Expression $Command
     if ($LASTEXITCODE -notin $ValidExitCodes)
     {
+        $Validation
         throw "Puppet module validation has failed. Exit code: $($LASTEXITCODE)."
     }
     $Warnings = $Validation -match 'pdk \(WARNING\)'
     if (($Warnings) -and ($FailOnWarning -eq $true))
     {
-        throw "Puppet module validation contains warnings.`n$Warnings"
+        $Warnings
+        throw "Puppet module validation contains warnings."
     }
     Write-Verbose "Puppet module successfully passed validation"
 }
