@@ -19,14 +19,16 @@ function Test-PuppetModuleConversion
         $ValidExitCodes = @(0)
     )
     # Perform a noop to be safe
-    $PDK_Output = Invoke-Expression 'pdk convert --noop 2>&1'
+    $Command = 'pdk convert --noop 2>&1'
+    $PDK_Output = Invoke-Expression $Command
     if ($LASTEXITCODE -notin $ValidExitCodes)
     {
+        $PDK_Output
         throw "Convert check failed. Exit code: $LASTEXITCODE."
     }
     if ($PDK_Output -notmatch 'No changes required.')
     {
-        throw "Drift detected after running pdk convert. Check convert_report.txt for details."
+        throw "Drift detected after running pdk convert. Check convert_report.txt in the module root for details."
     }
     Write-Verbose "No drift detected"
 }

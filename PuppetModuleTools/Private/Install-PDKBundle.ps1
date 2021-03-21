@@ -9,10 +9,11 @@ function Install-PDKBundle
         [array]
         $ExpectedExitCodes = @(0)
     )
-    
-    $PDK_Output = Invoke-Expression 'pdk bundle install 2>&1'
+    $Command = 'pdk bundle install 2>&1'
+    $PDK_Output = Invoke-Expression $Command
     if ($LASTEXITCODE -notin $ExpectedExitCodes)
     {
+        $PDK_Output
         throw "Bundle install failed, unhandled exit code. Exit code: $LASTEXITCODE"
     }
 }
