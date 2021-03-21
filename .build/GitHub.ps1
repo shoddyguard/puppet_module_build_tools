@@ -25,7 +25,7 @@ catch
 
 try
 {
-    Test-PuppetModule -ModulePath $ModulePath -TestAcceptance:$true -Provisioners @('GitHub') -Verbose
+    Test-PuppetModule -ModulePath $ModulePath -TestAcceptance:$true -Provisioners @('github') -Verbose
 }
 catch
 {
